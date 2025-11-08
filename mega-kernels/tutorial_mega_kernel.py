@@ -56,7 +56,9 @@ def standard_gelu_scale(x, scale_factor):
 # ============================================================================
 
 # We'll write a custom CUDA kernel that does BOTH operations in one pass
-CUDA_KERNEL_CODE = """
+
+# CUDA kernel code
+CUDA_SOURCE = """
 #include <torch/extension.h>
 #include <cuda_runtime.h>
 
@@ -116,6 +118,13 @@ torch::Tensor fused_gelu_scale_forward(
     
     return output;
 }
+"""
+
+# C++ bindings
+CPP_SOURCE = """
+#include <torch/extension.h>
+
+torch::Tensor fused_gelu_scale_forward(torch::Tensor input, float scale_factor);
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("forward", &fused_gelu_scale_forward, "Fused GELU + Scale forward (CUDA)");
@@ -127,8 +136,8 @@ from torch.utils.cpp_extension import load_inline
 
 cuda_module = load_inline(
     name='fused_gelu_scale',
-    cpp_sources='',
-    cuda_sources=CUDA_KERNEL_CODE,
+    cpp_sources=CPP_SOURCE,
+    cuda_sources=CUDA_SOURCE,
     functions=['forward'],
     verbose=False,
     extra_cuda_cflags=['-O3', '--use_fast_math']
