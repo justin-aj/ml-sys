@@ -60,7 +60,6 @@ def standard_gelu_scale(x, scale_factor):
 # CUDA kernel code
 CUDA_SOURCE = """
 #include <torch/extension.h>
-#include <cuda_runtime.h>
 
 // GELU approximation: 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
 __device__ __forceinline__ float gelu(float x) {
@@ -98,7 +97,7 @@ __global__ void fused_gelu_scale_cuda_kernel(
     // Total memory operations: 1 read + 1 write (50% reduction!)
 }
 
-// C++ wrapper function
+// C++ wrapper function that calls the CUDA kernel
 torch::Tensor fused_gelu_scale_forward(
     torch::Tensor input,
     float scale_factor
@@ -120,15 +119,9 @@ torch::Tensor fused_gelu_scale_forward(
 }
 """
 
-# C++ bindings
+# C++ bindings - this creates the Python module
 CPP_SOURCE = """
-#include <torch/extension.h>
-
 torch::Tensor fused_gelu_scale_forward(torch::Tensor input, float scale_factor);
-
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-    m.def("forward", &fused_gelu_scale_forward, "Fused GELU + Scale forward (CUDA)");
-}
 """
 
 # Compile the CUDA kernel using PyTorch's JIT
@@ -138,7 +131,7 @@ cuda_module = load_inline(
     name='fused_gelu_scale',
     cpp_sources=CPP_SOURCE,
     cuda_sources=CUDA_SOURCE,
-    functions=['forward'],
+    functions=['fused_gelu_scale_forward'],
     verbose=False,
     extra_cuda_cflags=['-O3', '--use_fast_math']
 )
@@ -154,7 +147,7 @@ def mega_kernel_gelu_scale(x, scale_factor):
     = 1 read + 1 write to global memory
     """
     # Call the compiled CUDA kernel
-    return cuda_module.forward(x, scale_factor)
+    return cuda_module.fused_gelu_scale_forward(x, scale_factor)
 
 
 # ============================================================================
