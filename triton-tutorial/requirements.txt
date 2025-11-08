@@ -1,0 +1,14 @@
+# Triton Tutorial Dependencies
+
+# Core requirement - installs easily!
+triton>=2.1.0
+
+# PyTorch for comparison and data handling
+torch>=2.0.0
+
+# Optional: for visualization and analysis
+matplotlib>=3.5.0
+numpy>=1.21.0
+
+# Optional: for profiling
+py-spy>=0.3.14
