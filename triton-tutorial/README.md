@@ -32,22 +32,19 @@
    - Shows register reuse patterns
    - Expected speedup: 1.5-2x
 
-3. **`flash_attention_lite.py`** - Advanced fusion
+3. **`flash_attention_lite.py`** - Advanced fusion (THE KILLER APP!)
    - Simplified Flash Attention concept
    - Online softmax algorithm
-   - Shows how fusion enables new algorithms
-   - Expected speedup: 3-4x on long sequences
+   - Block-wise computation without materializing [N×N] attention matrix
+   - Shows how fusion enables fundamentally new algorithms
+   - Memory: O(N²) → O(N) - enables GPT-4's 32k context!
+   - Expected speedup: 2-4x on long sequences
 
 ### Deep Dives
 4. **`memory_analysis.py`** - Visualize the problem
    - Count memory transactions (PyTorch vs Triton)
    - Bandwidth utilization analysis
    - Shows exactly why fusion wins
-
-5. **`auto_tuning.py`** - Performance optimization
-   - Block size tuning
-   - Occupancy vs cache tradeoffs
-   - Get every last % of performance
 
 ### Reference Materials
 - **`LEARNING_GUIDE.md`** - Triton concepts explained
