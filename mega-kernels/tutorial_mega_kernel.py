@@ -24,7 +24,10 @@ This is a common pattern in transformers (activation + projection).
 
 import torch
 import time
-import numpy as np
+import os
+
+# Set CUDA architecture for V100 (compute capability 7.0)
+os.environ['TORCH_CUDA_ARCH_LIST'] = '7.0'
 
 # ============================================================================
 # PART 1: Standard Approach (2 separate operations)
@@ -54,7 +57,8 @@ def standard_gelu_scale(x, scale_factor):
 
 # We'll write a custom CUDA kernel that does BOTH operations in one pass
 CUDA_KERNEL_CODE = """
-#include <cuda_fp16.h>
+#include <torch/extension.h>
+#include <cuda_runtime.h>
 
 // GELU approximation: 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
 __device__ __forceinline__ float gelu(float x) {
@@ -66,7 +70,7 @@ __device__ __forceinline__ float gelu(float x) {
 }
 
 // MEGA KERNEL: Fuses GELU + Scale into a single kernel
-__global__ void fused_gelu_scale_kernel(
+__global__ void fused_gelu_scale_cuda_kernel(
     const float* __restrict__ input,
     float* __restrict__ output,
     float scale_factor,
@@ -91,6 +95,31 @@ __global__ void fused_gelu_scale_kernel(
     
     // Total memory operations: 1 read + 1 write (50% reduction!)
 }
+
+// C++ wrapper function
+torch::Tensor fused_gelu_scale_forward(
+    torch::Tensor input,
+    float scale_factor
+) {
+    auto output = torch::empty_like(input);
+    int total_elements = input.numel();
+    
+    const int threads = 256;
+    const int blocks = (total_elements + threads - 1) / threads;
+    
+    fused_gelu_scale_cuda_kernel<<<blocks, threads>>>(
+        input.data_ptr<float>(),
+        output.data_ptr<float>(),
+        scale_factor,
+        total_elements
+    );
+    
+    return output;
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+    m.def("forward", &fused_gelu_scale_forward, "Fused GELU + Scale forward (CUDA)");
+}
 """
 
 # Compile the CUDA kernel using PyTorch's JIT
@@ -100,7 +129,7 @@ cuda_module = load_inline(
     name='fused_gelu_scale',
     cpp_sources='',
     cuda_sources=CUDA_KERNEL_CODE,
-    functions=['fused_gelu_scale_kernel'],
+    functions=['forward'],
     verbose=False,
     extra_cuda_cflags=['-O3', '--use_fast_math']
 )
@@ -115,21 +144,8 @@ def mega_kernel_gelu_scale(x, scale_factor):
     - Writing final result to memory
     = 1 read + 1 write to global memory
     """
-    output = torch.empty_like(x)
-    total_elements = x.numel()
-    
-    # Launch configuration
-    threads_per_block = 256
-    num_blocks = (total_elements + threads_per_block - 1) // threads_per_block
-    
-    # Launch the fused kernel
-    cuda_module.fused_gelu_scale_kernel(
-        x, output, scale_factor, total_elements,
-        block=(threads_per_block, 1, 1),
-        grid=(num_blocks, 1, 1)
-    )
-    
-    return output
+    # Call the compiled CUDA kernel
+    return cuda_module.forward(x, scale_factor)
 
 
 # ============================================================================
