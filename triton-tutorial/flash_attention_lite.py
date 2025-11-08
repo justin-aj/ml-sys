@@ -63,6 +63,7 @@ def flash_attention_fwd_kernel(
     stride_vz, stride_vh, stride_vn, stride_vk,  # V strides
     stride_oz, stride_oh, stride_om, stride_ok,  # Out strides
     Z, H, N_CTX, D_HEAD,    # Dimensions
+    scale,                  # Attention scale factor (1/sqrt(d_head))
     BLOCK_M: tl.constexpr,  # Block size for queries
     BLOCK_N: tl.constexpr,  # Block size for keys
     BLOCK_DMODEL: tl.constexpr,  # Hidden dimension
@@ -134,7 +135,7 @@ def flash_attention_fwd_kernel(
         # This creates a [BLOCK_M × BLOCK_N] matrix in SRAM (NOT written to DRAM!)
         qk = tl.zeros([BLOCK_M, BLOCK_N], dtype=tl.float32)
         qk += tl.dot(q, tl.trans(k))  # Matrix multiply in SRAM
-        qk *= 1.0 / math.sqrt(D_HEAD)  # Scale
+        qk = qk * scale  # Apply scale factor
         
         # Causal mask (for autoregressive models like GPT)
         # Only attend to earlier positions
@@ -207,6 +208,9 @@ def flash_attention_lite(q, k, v, causal=True):
     BLOCK_M = 64  # Query block size
     BLOCK_N = 64  # Key/value block size
     
+    # Compute scale factor outside kernel
+    scale = 1.0 / math.sqrt(head_dim)
+    
     # Number of query blocks
     num_blocks = triton.cdiv(seq_len, BLOCK_M)
     
@@ -221,6 +225,7 @@ def flash_attention_lite(q, k, v, causal=True):
         v.stride(0), v.stride(1), v.stride(2), v.stride(3),
         output.stride(0), output.stride(1), output.stride(2), output.stride(3),
         batch, num_heads, seq_len, head_dim,
+        scale,
         BLOCK_M=BLOCK_M,
         BLOCK_N=BLOCK_N,
         BLOCK_DMODEL=head_dim,
