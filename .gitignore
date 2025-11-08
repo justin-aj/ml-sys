@@ -1,0 +1,44 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# CUDA build artifacts
+*.o
+*.ptx
+*.cubin
+*.fatbin
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Logs
+*.log
