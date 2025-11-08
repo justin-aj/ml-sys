@@ -204,9 +204,20 @@ def flash_attention_lite(q, k, v, causal=True):
     # Allocate softmax denominators (for backward pass, not used in this tutorial)
     L = torch.empty((batch * num_heads, seq_len), device=q.device, dtype=torch.float32)
     
-    # Block sizes (these should be tuned for your GPU)
-    BLOCK_M = 64  # Query block size
-    BLOCK_N = 64  # Key/value block size
+    # Block sizes optimized for V100/A100
+    # Larger blocks = fewer kernel launches = better for V100
+    if seq_len <= 512:
+        BLOCK_M = 128
+        BLOCK_N = 128
+    elif seq_len <= 1024:
+        BLOCK_M = 128
+        BLOCK_N = 64
+    else:
+        BLOCK_M = 64
+        BLOCK_N = 64
+    
+    # Ensure BLOCK_DMODEL is power of 2
+    BLOCK_DMODEL = triton.next_power_of_2(head_dim)
     
     # Compute scale factor outside kernel
     scale = 1.0 / math.sqrt(head_dim)
@@ -228,7 +239,7 @@ def flash_attention_lite(q, k, v, causal=True):
         scale,
         BLOCK_M=BLOCK_M,
         BLOCK_N=BLOCK_N,
-        BLOCK_DMODEL=head_dim,
+        BLOCK_DMODEL=BLOCK_DMODEL,
     )
     
     return output
@@ -313,8 +324,9 @@ def benchmark_attention(batch=4, num_heads=8, seq_len=1024, head_dim=64, num_run
     print(f"\n{'⚡'} Flash Attention (Triton)")
     print("-" * 70)
     
-    # Warmup
-    for _ in range(5):
+    # Warmup (more iterations for Triton compilation)
+    print("  Warming up (compiling kernel)...")
+    for _ in range(20):
         _ = flash_attention_lite(q, k, v)
     torch.cuda.synchronize()
     
@@ -352,7 +364,19 @@ def benchmark_attention(batch=4, num_heads=8, seq_len=1024, head_dim=64, num_run
     print(f"{'='*70}")
     print(f"PyTorch:        {pytorch_time:.3f} ms")
     print(f"Flash Attn:     {flash_time:.3f} ms")
-    print(f"Speedup:        {speedup:.2f}x {'🚀' if speedup > 2.0 else '✓' if speedup > 1.2 else '⚠️'}")
+    if speedup > 1.2:
+        print(f"Speedup:        {speedup:.2f}x {'🚀' if speedup > 2.0 else '✓'}")
+    else:
+        print(f"Speedup:        {speedup:.2f}x ⚠️")
+        print(f"\n⚠️  Flash Attention is SLOWER! This can happen because:")
+        print(f"    1. Kernel compilation overhead not amortized")
+        print(f"    2. Block sizes not optimal for your GPU")
+        print(f"    3. Problem size too small (seq_len < 1024)")
+        print(f"    4. PyTorch's cuDNN is VERY optimized for standard attention")
+        print(f"\n💡 Flash Attention wins on:")
+        print(f"    - Longer sequences (2048+)")
+        print(f"    - Memory savings (still {attention_matrix_size/(qkv_size + attention_matrix_size)*100:.0f}% less!)")
+        print(f"    - Enabling sequences that don't fit in PyTorch")
     print(f"Memory saved:   {attention_matrix_size:.1f} MB ({attention_matrix_size/(qkv_size + attention_matrix_size)*100:.0f}%)")
     print(f"{'='*70}\n")
     
@@ -395,24 +419,24 @@ def scaling_analysis():
         v = torch.randn(batch, num_heads, seq_len, head_dim, device='cuda', dtype=torch.float16)
         
         # PyTorch
-        for _ in range(3):
+        for _ in range(10):
             _ = pytorch_attention(q, k, v)
         torch.cuda.synchronize()
         start = time.perf_counter()
-        for _ in range(20):
+        for _ in range(50):
             _ = pytorch_attention(q, k, v)
         torch.cuda.synchronize()
-        pytorch_time = (time.perf_counter() - start) / 20 * 1000
+        pytorch_time = (time.perf_counter() - start) / 50 * 1000
         
-        # Flash
-        for _ in range(3):
+        # Flash (more warmup for compilation)
+        for _ in range(30):
             _ = flash_attention_lite(q, k, v)
         torch.cuda.synchronize()
         start = time.perf_counter()
-        for _ in range(20):
+        for _ in range(50):
             _ = flash_attention_lite(q, k, v)
         torch.cuda.synchronize()
-        flash_time = (time.perf_counter() - start) / 20 * 1000
+        flash_time = (time.perf_counter() - start) / 50 * 1000
         
         speedup = pytorch_time / flash_time
         mem_saved = batch * num_heads * seq_len * seq_len * 2 / 1e6
