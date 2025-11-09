@@ -12,7 +12,9 @@
 
 ## 🚀 Quick Start (Hands-On Example)
 
-We've created a **simple Python implementation** that demonstrates Mirage's core concept:
+We've created **two hands-on Python examples** that demonstrate Mirage's core concepts:
+
+### Example 1: Simple Matrix Chain Optimization
 
 ```bash
 cd mirage-tutorial
@@ -26,7 +28,19 @@ This example shows:
 - Greedy (TASO-style) vs Exhaustive (Mirage-style) optimization
 - Real performance comparison on matrix chain multiplication
 
-**No GPU required!** Runs on CPU in seconds.
+### Example 2: PyTorch FX Graph Rewriting (Advanced)
+
+```bash
+python pytorch_fx_rewrite.py
+```
+
+This example demonstrates:
+- **Real PyTorch** graph transformations using FX
+- Multiple rewrite rules (x*2 ↔ x+x, distributive law)
+- Cost-based selection via benchmarking
+- How production ML frameworks use these concepts
+
+**Both examples run on CPU - no GPU required!**
 
 ---
 
