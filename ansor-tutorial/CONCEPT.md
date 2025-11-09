@@ -1,4 +1,10 @@
-# Ansor Tutorial: Learned Auto-Scheduling for GPUs
+# Ansor: Learned Auto-Scheduling for GPUs
+
+> **⚠️ NOTE:** This is a **concept-only** document for educational reference.  
+> **No hands-on tutorial** is provided due to TVM installation complexity.  
+> This document explains what Ansor is, why it's unique, and how it compares to other tools like Triton.
+
+---
 
 ## 🎯 The Core Idea
 
@@ -107,35 +113,34 @@ Instead of trying random schedules or using fixed heuristics, Ansor:
 
 ---
 
-## 🎓 What You'll Learn in This Tutorial
+## 🎓 What Ansor Can Do (Conceptual Overview)
 
-### Tutorial 1: **Simple MatMul Auto-Tuning**
-- Define a matrix multiplication in TVM
-- Run Ansor auto-tuning (1000 trials)
-- Compare Ansor schedule vs PyTorch cuBLAS
-- Visualize the learned schedule (loop order, tiling)
-- **Expected Result:** 80-95% of cuBLAS performance (pretty good for auto-generated!)
+### Capability 1: **Simple MatMul Auto-Tuning**
+- Define a matrix multiplication in TVM compute language
+- Run Ansor auto-tuning (1000+ trials) to explore schedules
+- Automatically find loop orders, tile sizes, parallelization strategies
+- **Expected Result:** 80-95% of cuBLAS performance (fully auto-generated!)
 
-### Tutorial 2: **Conv2D Schedule Exploration**
+### Capability 2: **Conv2D Schedule Exploration**
 - Define a 2D convolution workload
-- Explore different schedule strategies:
+- Ansor explores different schedule strategies:
   - Spatial tiling vs channel tiling
-  - Shared memory usage
-  - Vectorization patterns
-- See how Ansor chooses different strategies for different input sizes
-- **Expected Result:** Understanding why different schedules win for different shapes
+  - Shared memory usage patterns
+  - Vectorization and unrolling factors
+- Chooses different strategies for different input shapes automatically
+- **Expected Result:** Matches or beats cuDNN for many configurations
 
-### Tutorial 3: **Cross-Device Transfer Learning**
+### Capability 3: **Cross-Device Transfer Learning**
 - Tune a kernel on GPU A (e.g., V100)
 - Transfer the learned cost model to GPU B (e.g., A100)
-- See how Ansor adapts with minimal re-tuning
-- **Expected Result:** 50-80% speedup from transfer learning vs tuning from scratch
+- Ansor adapts with minimal re-tuning using transfer learning
+- **Expected Result:** 50-80% faster convergence vs tuning from scratch
 
-### Tutorial 4: **Custom Operator Auto-Tuning**
-- Define a custom fused operation (e.g., LayerNorm + GELU)
-- Let Ansor find the best schedule
-- Compare vs hand-written Triton kernel
-- **Expected Result:** Competitive performance without manual kernel engineering
+### Capability 4: **Custom Operator Auto-Tuning**
+- Define custom fused operations (e.g., LayerNorm + GELU)
+- Ansor finds optimal schedule without manual kernel engineering
+- Competitive with hand-written CUDA/Triton kernels
+- **Expected Result:** Competitive performance in hours vs weeks of manual work
 
 ---
 
@@ -193,35 +198,47 @@ Based on TVM/Ansor papers and real-world usage:
 
 ---
 
-## 🛠️ Tutorial Structure
+## 🛠️ What Would Be Needed (Installation Reality Check)
 
+**Why no hands-on tutorial?** TVM installation is complex:
+
+```bash
+# TVM installation challenges:
+- Requires building from source (no simple pip install)
+- Complex dependencies: LLVM, CUDA toolkit, CMake, C++ compiler
+- Platform-specific issues (especially on Windows)
+- Build time: 30-60 minutes
+- Frequent compatibility issues between TVM/LLVM/CUDA versions
+```
+
+**Conceptual file structure** (if TVM were easy to install):
 ```
 ansor-tutorial/
-├── README.md                    # Start here
-├── CONCEPT.md                   # This file (the "why")
-├── INSTALLATION.md              # TVM + Ansor setup (can be tricky!)
-├── tutorial_1_matmul.py         # Basic auto-tuning workflow
-├── tutorial_2_conv2d.py         # Schedule exploration
-├── tutorial_3_transfer.py       # Cross-device learning
-├── tutorial_4_custom.py         # Custom operator tuning
-├── visualize_schedule.py        # Visualize learned schedules
-├── compare_tools.py             # Ansor vs Triton vs PyTorch
-├── LEARNING_GUIDE.md            # Deep dive into Ansor concepts
-└── REAL_WORLD_EXAMPLES.md       # Production use cases
+├── CONCEPT.md                   # This file (educational reference)
+├── INSTALLATION.md              # Would detail TVM setup (complex!)
+├── example_matmul.py            # Would show auto-tuning workflow
+├── example_conv2d.py            # Would show schedule exploration
+├── example_transfer.py          # Would show cross-device learning
+├── example_custom.py            # Would show custom operator tuning
+└── COMPARISON.md                # Ansor vs Triton vs PyTorch
 ```
+
+**Reality:** Triton tutorial is much more practical for learning GPU optimization!
 
 ---
 
-## 🎯 Learning Objectives
+## 🎯 Key Takeaways (Educational)
 
-After completing this tutorial, you will:
+After understanding this concept, you should know:
 
-1. ✅ **Understand** the auto-scheduling search space (loops, tiling, parallelization)
-2. ✅ **Use** TVM + Ansor to auto-tune kernels on your GPU
-3. ✅ **Interpret** learned schedules and understand why they're fast
-4. ✅ **Compare** auto-tuning vs manual optimization (Triton)
-5. ✅ **Apply** transfer learning across devices
-6. ✅ **Know when** to use Ansor vs other tools (Triton, TensorRT, etc.)
+1. ✅ **Understand** the auto-scheduling search space is MASSIVE (10^10+ possible schedules)
+2. ✅ **Know** Ansor uses machine learning (XGBoost) to navigate this space efficiently
+3. ✅ **Recognize** Ansor is the only tool that does learned auto-scheduling end-to-end
+4. ✅ **Compare** auto-tuning (Ansor) vs manual optimization (Triton) trade-offs
+5. ✅ **Appreciate** transfer learning across devices (V100 → A100)
+6. ✅ **Decide when** to use Ansor vs other tools in real-world scenarios
+
+**Practical advice:** For hands-on GPU optimization learning, use the **Triton tutorial** instead!
 
 ---
 
@@ -255,17 +272,52 @@ We'll cover **both** Ansor (simpler, educational) and Meta-Scheduler (cutting-ed
 
 ---
 
-## 🎬 Next Steps
+## 🎬 What to Do Instead
 
-Ready to dive in?
+**Want hands-on GPU optimization?**
 
-1. **Read** `INSTALLATION.md` to set up TVM + Ansor (we'll make it as painless as possible!)
-2. **Run** `tutorial_1_matmul.py` to see auto-tuning in action
-3. **Explore** the learned schedules and understand what Ansor discovered
-4. **Compare** with your Triton kernels to see the trade-offs
+1. ✅ **Complete the Triton tutorial** (in `../triton-tutorial/`)
+   - Practical, pip-installable, runs on your GPU
+   - Learn fusion, memory optimization, real kernel engineering
+   - See actual 1.3-1.5x speedups on V100
 
-Let's unlock the power of **machine learning for kernel optimization**! 🚀
+2. 📚 **Read Ansor papers** (conceptual understanding)
+   - [Ansor: Generating High-Performance Tensor Programs](https://arxiv.org/abs/2006.06762)
+   - [TVM: An Automated End-to-End Optimizing Compiler](https://arxiv.org/abs/1802.04799)
+
+3. 🏢 **Use production tools** (when TVM is already set up)
+   - OctoML platform (TVM as-a-service, no installation needed)
+   - AWS SageMaker Neo (uses TVM under the hood)
+   - Pre-built TVM Docker images (avoid building from source)
+
+**Bottom line:** Understand Ansor conceptually, use Triton practically!
 
 ---
 
 *"The best GPU kernel is the one you don't have to write yourself."* — TVM Philosophy
+
+---
+
+## 📚 Additional Resources
+
+**Papers:**
+- [Ansor: Generating High-Performance Tensor Programs for Deep Learning](https://arxiv.org/abs/2006.06762)
+- [Learning to Optimize Tensor Programs](https://arxiv.org/abs/1805.08166)
+- [TVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://arxiv.org/abs/1802.04799)
+
+**Production Systems Using Ansor/TVM:**
+- **OctoML:** TVM-as-a-service platform for model optimization
+- **AWS SageMaker Neo:** Model optimization for edge deployment
+- **Meta/Facebook:** PyTorch model optimization backend
+- **AMD:** ROCm ML framework optimization
+
+**When You Might Actually Use Ansor:**
+- Your company already has TVM infrastructure set up
+- Optimizing for exotic/new hardware (RISC-V, custom accelerators)
+- Need cross-device optimization (100+ device types)
+- Research projects exploring auto-scheduling algorithms
+- You have ML engineers who can maintain TVM builds
+
+---
+
+*This document serves as educational reference for understanding the landscape of GPU optimization tools. For practical, hands-on learning, see the Triton tutorial in `../triton-tutorial/`.*
