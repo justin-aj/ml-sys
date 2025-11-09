@@ -503,9 +503,7 @@ TASO optimized: 290 operations (27.5% reduction)
 
 Ready to see these optimizations in action?
 
-1. **`simple_rewrite.py`** - Example 1 (distributivity) with actual code
-2. **`transformer_attention.py`** - Example 2 (attention) with benchmarks
-3. **`compare_graphs.py`** - Visualize before/after graphs
+**Run `simple_rewrite.py`** - Example 1 (distributivity) with actual benchmarks on your machine!
 
 Let's see TASO eliminate operations! 📉🚀
 

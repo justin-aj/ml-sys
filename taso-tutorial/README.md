@@ -32,11 +32,7 @@ Y = A · (B + C)
 
 ## 📚 Tutorial Structure
 
-1. **`simple_rewrite.py`** - Basic example: `A·B + A·C → A·(B+C)`
-2. **`transformer_attention.py`** - Real-world: Optimize attention block
-3. **`fusion_patterns.py`** - Multiple rewrite patterns
-4. **`compare_graphs.py`** - Visualize before/after optimization
-5. **`benchmark.py`** - Measure actual speedups
+1. **`simple_rewrite.py`** - Basic example: `A·B + A·C → A·(B+C)` with full benchmarking
 
 ---
 
@@ -51,17 +47,10 @@ python simple_rewrite.py    # See basic rewrite in action
 
 ## 📖 Learning Path
 
-**Start Here:**
-1. Read `CONCEPT.md` - Understand graph-level optimization
-2. Read `EXAMPLES.md` - See concrete rewrite rules
-3. Run `simple_rewrite.py` - Basic A·B + A·C example
-4. Run `transformer_attention.py` - Real-world transformer optimization
-5. Run `compare_graphs.py` - Visualize graph transformations
-
-**Deep Dive:**
-- `REWRITE_RULES.md` - All algebraic identities TASO uses
-- `REAL_WORLD_IMPACT.md` - Production use cases (OctoML, Microsoft)
-- `COMBINING_TOOLS.md` - Use TASO + Triton + Ansor together
+1. **Read `CONCEPT.md`** - Understand graph-level optimization theory
+2. **Read `EXAMPLES.md`** - See 7 concrete rewrite examples with detailed analysis
+3. **Run `simple_rewrite.py`** - See distributive property optimization in action
+4. **Compare with Triton tutorial** - Understand kernel-level vs graph-level optimization
 
 ---
 
@@ -95,15 +84,14 @@ After completing this tutorial:
 ## 🛠️ Installation
 
 ```bash
-# TASO has dependencies, but examples use NumPy/PyTorch to simulate
-pip install numpy torch matplotlib networkx
+# Simple - just PyTorch for the tutorial
+pip install torch numpy
 
-# Optional: Install actual TASO (requires compilation)
-# git clone https://github.com/jiazhihao/TASO.git
-# cd TASO && mkdir build && cd build && cmake .. && make
+# Optional for visualization
+pip install matplotlib
 ```
 
-**Note:** Our tutorial uses **simplified Python implementations** to demonstrate concepts without complex installation. Real TASO requires C++ compilation.
+**Note:** This tutorial uses **PyTorch to demonstrate TASO concepts** without requiring actual TASO installation (which requires complex C++ compilation). You learn the same principles!
 
 ---
 
@@ -180,17 +168,10 @@ Based on TASO paper and production deployments:
 
 ```
 taso-tutorial/
-├── README.md                      # This file
-├── CONCEPT.md                     # Graph optimization explained
-├── EXAMPLES.md                    # Concrete rewrite examples
-├── REWRITE_RULES.md               # All algebraic identities
-├── simple_rewrite.py              # Basic A·B + A·C example
-├── transformer_attention.py       # Real transformer optimization
-├── fusion_patterns.py             # Multiple rewrite patterns
-├── compare_graphs.py              # Visualize transformations
-├── benchmark.py                   # Measure actual speedups
-├── REAL_WORLD_IMPACT.md           # Production deployments
-└── COMBINING_TOOLS.md             # TASO + Triton + Ansor
+├── README.md                      # This file - overview and getting started
+├── CONCEPT.md                     # Graph optimization theory and how TASO works
+├── EXAMPLES.md                    # 7 concrete rewrite examples with calculations
+└── simple_rewrite.py              # Hands-on: distributive property optimization
 ```
 
 ---
@@ -198,10 +179,9 @@ taso-tutorial/
 ## 🎬 Next Steps
 
 1. **Read `CONCEPT.md`** - Understand the theory
-2. **Read `EXAMPLES.md`** - See concrete examples
-3. **Run `simple_rewrite.py`** - See it in action
-4. **Run `transformer_attention.py`** - Real-world impact
-5. **Compare with Triton tutorial** - See how they complement each other!
+2. **Read `EXAMPLES.md`** - See concrete examples with math
+3. **Run `simple_rewrite.py`** - See it in action!
+4. **Compare with Triton tutorial** - See how graph-level and kernel-level optimization complement each other
 
 ---
 

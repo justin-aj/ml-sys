@@ -358,9 +358,8 @@ X2 = A · B  # Duplicate!
 
 Ready to see concrete examples?
 
-1. **`EXAMPLES.md`** - Walk through detailed rewrite examples
-2. **`simple_rewrite.py`** - Run the A·B + A·C example
-3. **`transformer_attention.py`** - Optimize real attention block
+1. **`EXAMPLES.md`** - Walk through 7 detailed rewrite examples with full calculations
+2. **`simple_rewrite.py`** - Run the A·B + A·C example with benchmarks on your machine
 
 Let's see TASO eliminate operations! 🚀
 
