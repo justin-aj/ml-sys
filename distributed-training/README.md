@@ -21,6 +21,8 @@ Fine-tune **real open-source models** (GPT-2 from HuggingFace) using different d
 5. **ZeRO-Offload** - Use CPU memory for optimizer
 6. **ZeRO-Infinity** - Use NVMe for massive models
 
+**NEW!** See `alpa_tutorial/` for **automatic parallelism** - Alpa decides the best strategy for you!
+
 Each example shows:
 - ✅ **Real models** from HuggingFace (GPT-2 small/medium/large/xl)
 - ✅ **Real datasets** (WikiText-2)

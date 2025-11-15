@@ -1,0 +1,20 @@
+# Alpa requirements
+# JAX ecosystem for automatic differentiation
+jax>=0.4.0
+jaxlib>=0.4.0
+
+# Alpa for automatic model parallelism
+alpa>=0.2.0
+
+# Flax for neural network layers (JAX equivalent of PyTorch nn)
+flax>=0.6.0
+
+# Optax for optimizers (JAX equivalent of torch.optim)
+optax>=0.1.0
+
+# For visualization
+matplotlib>=3.5.0
+numpy>=1.21.0
+
+# Optional: For better performance
+# cuda11_pip  # Install JAX with CUDA support
