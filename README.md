@@ -8,7 +8,7 @@ Learn how to make your ML models **2-5x faster** by optimizing at every level of
 
 ## 🎯 What You'll Learn
 
-This repository contains **5 complete tutorials** teaching modern GPU optimization techniques:
+This repository contains **6 complete tutorials** teaching modern GPU optimization and distributed training:
 
 | Tutorial | Level | Time | Speedup | What You Learn | Status |
 |----------|-------|------|---------|----------------|--------|
@@ -17,6 +17,7 @@ This repository contains **5 complete tutorials** teaching modern GPU optimizati
 | **[Mega-Kernels](./mega-kernels/)** | Kernel | 1 hour | 1.6-1.9x | CUDA kernel fusion concepts | ✅ Hands-On |
 | **[Triton](./triton-tutorial/)** | Kernel | 2-3 hours | 1.3-1.5x | Production GPU programming in Python | ✅ Hands-On |
 | **[Ansor](./ansor-tutorial/)** | Schedule | 30 min | 1.2-1.5x | ML-guided auto-tuning | 📖 Concept Only |
+| **[Distributed Training](./distributed-training/)** | System | 2 hours | 64x memory | ZeRO, Data Parallel, Multi-GPU training | ✅ Hands-On |
 
 **Combined Impact:** Stack these techniques for **2-5x end-to-end speedup** on real models!
 
@@ -87,6 +88,23 @@ Result: 80-95% of hand-tuned performance, but fully automated!
 - ✅ Understand ML-guided optimization
 - ✅ Used in production: OctoML, AWS SageMaker Neo
 
+### **System Level: Distributed Training** 🌐
+Scale beyond single-GPU memory limits with data parallelism and ZeRO.
+```python
+# Without ZeRO: 10B param model needs 160 GB per GPU ❌
+# With ZeRO-3 on 8 GPUs: Only 20 GB per GPU ✅
+
+Memory per GPU = (Model + Grads + Optimizer) / N_GPUs
+                = 160 GB / 8 = 20 GB
+
+Result: Train 64× larger models with same hardware!
+```
+- ✅ Data Parallelism (simple baseline)
+- ✅ ZeRO Stage 1-3 (eliminate redundancy)
+- ✅ ZeRO-Offload (use CPU memory)
+- ✅ ZeRO-Infinity (use NVMe for trillion-param models)
+- ✅ Multi-node training examples
+
 ---
 
 ## 🏆 Real-World Impact
@@ -118,10 +136,10 @@ Cost Impact: $300K/year saved for a mid-size ML company
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ 1. GRAPH LEVEL (TASO)                                   │
+│ 1. GRAPH LEVEL (TASO/Mirage)                            │
 │    A@B + A@C → A@(B+C)                                  │
 │    Benefit: Eliminate 50% of operations                 │
-│    Speedup: 1.5-2x                                      │
+│    Speedup: 1.5-3x                                      │
 └──────────────────────┬──────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────┐
@@ -137,6 +155,13 @@ Cost Impact: $300K/year saved for a mid-size ML company
 │    Benefit: Optimal hardware utilization                │
 │    Speedup: 1.2-1.5x                                    │
 └──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│ 4. SYSTEM LEVEL (Distributed Training)                  │
+│    ZeRO-3: Shard model across GPUs                      │
+│    Benefit: Train 64× larger models                     │
+│    Memory: N× reduction (N = GPU count)                 │
+└─────────────────────────────────────────────────────────┘
                        │
                        ▼
                  FINAL MODEL
