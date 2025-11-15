@@ -102,12 +102,30 @@ Step   8 | Loss: 1.3353
 ## Visualizations Generated
 
 Six concept diagrams created via `alpa_visualize.py`:
-1. **data_parallel.png** - Data parallelism visualization
-2. **pipeline_parallel.png** - Pipeline parallelism stages
-3. **tensor_parallel.png** - Tensor parallelism explained
-4. **alpa_hierarchy.png** - Two-level optimization hierarchy
-5. **performance_comparison.png** - Alpa vs manual performance
-6. **communication_comparison.png** - Communication overhead analysis
+
+### 1. Data Parallelism
+![Data Parallel](data_parallel.png)
+*Shows how data is split across multiple GPUs while model is replicated*
+
+### 2. Pipeline Parallelism
+![Pipeline Parallel](pipeline_parallel.png)
+*Demonstrates how model layers are split across GPUs in stages*
+
+### 3. Tensor Parallelism
+![Tensor Parallel](tensor_parallel.png)
+*Explains how individual layers are split across multiple GPUs*
+
+### 4. Alpa's Two-Level Hierarchy
+![Alpa Hierarchy](alpa_hierarchy.png)
+*Shows Alpa's Intra-op (tensor parallel) and Inter-op (pipeline parallel) optimization*
+
+### 5. Performance Comparison
+![Performance Comparison](performance_comparison.png)
+*Compares Alpa's automatic approach vs manual tuning - Alpa achieves 4.6× speedup*
+
+### 6. Communication Overhead
+![Communication Comparison](communication_comparison.png)
+*Analyzes communication patterns and overhead across different strategies*
 
 ## Tutorial Structure
 
