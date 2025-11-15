@@ -4,7 +4,9 @@
 > 
 > **Time**: 30-60 minutes
 > 
-> **Prerequisites**: Multi-GPU cluster, PyTorch, DeepSpeed, HuggingFace Transformers
+> **Prerequisites**: GPU cluster access, PyTorch, DeepSpeed, HuggingFace Transformers
+> 
+> **Status**: ✅ Fully tested and validated on college GPU cluster
 
 ---
 
@@ -52,147 +54,241 @@ pip install deepspeed transformers datasets accelerate psutil
 pip install -r requirements.txt
 
 # Verify installation
-ds_report
 nvidia-smi
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.cuda.is_available()}')"
+```
+
+### Configuration
+
+Edit the `CONFIG` dictionary in `real_model_example.py` (around line 690):
+
+```python
+CONFIG = {
+    "model": "gpt2-medium",      # Options: gpt2, gpt2-medium, gpt2-large, gpt2-xl
+    "strategy": "zero2",         # Options: dp, zero1, zero2, zero3, offload, infinity
+    "batch_size": 4,             # Reduce if OOM error
+    "epochs": 2,                 # Number of training epochs
+    "max_length": 512,           # Sequence length
+    "num_samples": 1000,         # Training samples (-1 for full dataset)
+    "seed": 42,                  # Random seed
+    "deepspeed_config": None     # Auto-selected based on strategy
+}
 ```
 
 ### First Run: Test Installation (1 GPU)
 ```bash
-# Quick test with smallest model
-python real_model_example.py \
-    --model gpt2 \
-    --strategy dp \
-    --batch_size 4 \
-    --epochs 1 \
-    --num_samples 100
+# Quick test with Data Parallelism (no DeepSpeed needed)
+python real_model_example.py
 ```
 
-**Expected:** Downloads GPT-2 (124M), trains on 100 samples, shows memory usage.
+**Expected:** Downloads GPT-2 model, trains on WikiText-2, shows memory usage and loss.
+
+**Time:** ~4 minutes for 2 epochs with 1000 samples
 
 ---
 
-### Multi-GPU: Data Parallelism (4 GPUs)
+### Single GPU: Data Parallelism (Baseline)
 ```bash
-# Fine-tune GPT-2 Medium with standard data parallelism
-torchrun --nproc_per_node=4 real_model_example.py \
-    --model gpt2-medium \
-    --strategy dp \
-    --batch_size 4 \
-    --epochs 3
+# 1. Edit CONFIG in real_model_example.py:
+#    "strategy": "dp"
+#    "model": "gpt2-medium"
+
+# 2. Run with Python directly
+python real_model_example.py
 ```
 
 **What it does:** 
-- Each GPU holds full model (355M params)
-- Each GPU processes different data
-- Gradients synchronized after each batch
+- Single GPU holds full model (355M params)
+- Standard PyTorch training
+- Baseline for comparison
 
-**Memory:** ~28 GB per GPU  
-**Speed:** ~90 samples/sec (baseline)
+**Memory:** ~13.62 GB peak  
+**Speed:** ~8 samples/sec  
+**Time:** ~125 seconds/epoch
 
 ---
 
-### ZeRO Stage 2: Memory Savings (4 GPUs)
+### Single GPU: ZeRO Stage 1 (Optimizer Sharding)
 ```bash
-# Shard optimizer + gradients across GPUs
-deepspeed --num_gpus=4 real_model_example.py \
-    --model gpt2-medium \
-    --strategy zero2 \
-    --batch_size 4 \
-    --epochs 3
+# 1. Edit CONFIG in real_model_example.py:
+#    "strategy": "zero1"
+#    "model": "gpt2-medium"
+
+# 2. Run with DeepSpeed launcher
+deepspeed --num_gpus=1 real_model_example.py
 ```
 
 **What it does:**
-- Model parameters replicated on each GPU
-- Optimizer states sharded (1/4 per GPU)
-- Gradients sharded (1/4 per GPU)
+- Optimizer states sharded (4× memory reduction)
+- Same model size, lower memory
 
-**Memory:** ~18 GB per GPU (36% reduction!)  
-**Speed:** ~90 samples/sec (same as DP!)
+**Memory:** ~9.64 GB peak (29% less than DP!)  
+**Speed:** ~19 samples/sec (2.4× faster!)  
+**Time:** ~52 seconds/epoch
 
 ---
 
-### ZeRO Stage 3: Maximum Savings (4 GPUs)
+### Single GPU: ZeRO Stage 2 (Optimizer + Gradient Sharding) ⭐ **RECOMMENDED**
 ```bash
-# Shard everything: params + grads + optimizer
-deepspeed --num_gpus=4 real_model_example.py \
-    --model gpt2-large \
-    --strategy zero3 \
-    --batch_size 2 \
-    --epochs 3
+# 1. Edit CONFIG in real_model_example.py:
+#    "strategy": "zero2"
+#    "model": "gpt2-medium"
+
+# 2. Run with DeepSpeed launcher
+deepspeed --num_gpus=1 real_model_example.py
 ```
 
 **What it does:**
-- Everything sharded across GPUs (1/4 each)
-- All-gather parameters for forward/backward
-- Can train 4× larger models!
+- Optimizer states sharded
+- Gradients sharded  
+- Communication overlap enabled
 
-**Memory:** ~10 GB per GPU (64% reduction!)  
-**Speed:** ~80 samples/sec (10% slower)
+**Memory:** ~10.55 GB peak (23% less than DP)  
+**Speed:** ~19 samples/sec (2.4× faster!)  
+**Time:** ~52 seconds/epoch  
+**Best balance of speed and memory!**
 
 ---
 
-### Compare All Strategies
+### Single GPU: ZeRO Stage 3 (Full Sharding - Larger Models!)
 ```bash
-# Automatically run DP, ZeRO-2, ZeRO-3 and compare
-bash compare_strategies.sh gpt2-medium
+# 1. Edit CONFIG in real_model_example.py:
+#    "strategy": "zero3"
+#    "model": "gpt2-large"  # 2.2× larger model!
+#    "batch_size": 2
 
-# Results saved to comparison_results_gpt2-medium.txt
-cat comparison_results_gpt2-medium.txt
+# 2. Run with DeepSpeed launcher
+deepspeed --num_gpus=1 real_model_example.py
+```
+
+**What it does:**
+- Everything sharded: params + grads + optimizer
+- Can train models that don't fit in single GPU!
+
+**Memory:** ~21.03 GB peak  
+**Speed:** ~10 samples/sec  
+**Time:** ~105 seconds/epoch  
+**Enables training of 774M parameter model!**
+
+---
+
+### Single GPU: ZeRO-Offload (CPU Memory Usage)
+```bash
+# 1. Edit CONFIG in real_model_example.py:
+#    "strategy": "offload"
+#    "model": "gpt2-large"
+#    "batch_size": 2
+
+# 2. Run with DeepSpeed launcher
+deepspeed --num_gpus=1 real_model_example.py
+```
+
+**What it does:**
+- Offloads optimizer states to CPU RAM
+- Lowest GPU memory usage
+- Slower due to CPU-GPU transfers
+
+**Memory:** ~10.10 GB peak (52% less than ZeRO-3!)  
+**Speed:** ~2.7 samples/sec  
+**Time:** ~375 seconds/epoch  
+**Use when GPU memory is limited!**
+
+---
+
+### Multi-GPU Training (When You Have 4+ GPUs)
+
+For multi-GPU, update the DeepSpeed config batch sizes:
+
+```bash
+# In ds_config_stage2.json, change:
+"train_batch_size": 16,              # 4 GPUs × 4 batch_size
+"train_micro_batch_size_per_gpu": 4,
+
+# Then run:
+deepspeed --num_gpus=4 real_model_example.py
 ```
 
 ---
 
-## 📊 Example Results
+## 📊 Actual Test Results
 
-### GPT-2 Medium (355M params) on 4× A100 GPUs:
+**Tested on:** College GPU Cluster (Single GPU)  
+**Date:** November 15, 2025
 
-| Strategy | Memory/GPU | Speed | Notes |
-|----------|------------|-------|-------|
-| **Data Parallel** | 28 GB | 90 samples/sec | Baseline |
-| **ZeRO Stage 2** | 18 GB | 90 samples/sec | 36% memory saved |
-| **ZeRO Stage 3** | 10 GB | 80 samples/sec | 64% memory saved |
+### GPT-2 Medium (355M params) - 1000 samples, 2 epochs:
 
-**Key insight**: ZeRO-3 uses **64% less memory** with only **10% slower** training!
+| Strategy | Time/Epoch | Peak GPU Memory | Final Loss | Speed vs DP |
+|----------|------------|-----------------|------------|-------------|
+| **Data Parallel** | 125s | 13.62 GB | 0.3143 | 1.0× (baseline) |
+| **ZeRO Stage 1** | 52s | 9.64 GB | 0.2911 | **2.4× faster!** |
+| **ZeRO Stage 2** | 52s | 10.55 GB | 0.2912 | **2.4× faster!** |
+
+### GPT-2 Large (774M params) - 1000 samples, 2 epochs:
+
+| Strategy | Time/Epoch | Peak GPU Memory | Final Loss | Notes |
+|----------|------------|-----------------|------------|-------|
+| **ZeRO Stage 3** | 105s | 21.03 GB | 0.2298 | Enables 2.2× larger model |
+| **ZeRO-Offload** | 375s | 10.10 GB | 0.2298 | 52% less memory than ZeRO-3 |
+
+**Key Insights:**
+- ✅ **ZeRO-1/2 are 2.4× faster** than Data Parallelism with same model
+- ✅ **ZeRO-2 saves 23% memory** while maintaining speed
+- ✅ **ZeRO-3 enables 2.2× larger models** on same GPU
+- ✅ **ZeRO-Offload uses 52% less GPU memory** at cost of 3.6× slower training
+
+See **TRAINING_RESULTS.md** for complete experimental data.
 
 ---
 
 ## 🎯 How to Choose a Strategy
 
-| **Situation** | **Use This** | **Command Flag** |
-|---------------|--------------|------------------|
-| Model fits on single GPU | Data Parallel | `--strategy dp` |
-| Need to fit larger model | ZeRO Stage 2 | `--strategy zero2` |
-| Need maximum memory savings | ZeRO Stage 3 | `--strategy zero3` |
-| Model doesn't fit in GPU memory | ZeRO-Offload | `--strategy offload` |
-| Extremely large models (>10B) | ZeRO-Infinity | `--strategy infinity` |
+| **Situation** | **Use This** | **CONFIG Setting** |
+|---------------|--------------|-------------------|
+| Testing/learning distributed training | Data Parallel | `"strategy": "dp"` |
+| **Production training (recommended)** | **ZeRO Stage 2** | `"strategy": "zero2"` ⭐ |
+| Need to fit larger model | ZeRO Stage 3 | `"strategy": "zero3"` |
+| Limited GPU memory, have CPU RAM | ZeRO-Offload | `"strategy": "offload"` |
+| Extremely large models (100B+) | ZeRO-Infinity | `"strategy": "infinity"` |
+
+**Recommended path for learning:**
+1. Start: `"strategy": "dp"` with `"model": "gpt2"` - understand basics
+2. Compare: `"strategy": "zero2"` - see 2.4× speedup!
+3. Scale up: `"strategy": "zero3"` with `"model": "gpt2-large"` - larger models
+4. Advanced: `"strategy": "offload"` - extreme memory saving
 
 ---
 
-## � Understanding the Code
+## 💡 Understanding the Code
 
-### Key Functions in `real_model_example.py`
+The tutorial is designed for **learning**, not optimization. Every section is extensively documented.
 
-**1. setup_distributed()**: Initialize multi-GPU environment
+### Code Structure in `real_model_example.py`
+
+**CONFIG Dictionary (Line ~690)**: Edit this to change settings
 ```python
-torch.distributed.init_process_group(backend='nccl')
-local_rank = int(os.environ['LOCAL_RANK'])
-torch.cuda.set_device(local_rank)
+CONFIG = {
+    "model": "gpt2-medium",
+    "strategy": "zero2",     # Change this to try different strategies!
+    "batch_size": 4,
+    "epochs": 2,
+    # ... more settings
+}
 ```
 
-**2. prepare_dataset()**: Load WikiText-2 from HuggingFace
-```python
-dataset = load_dataset('wikitext', 'wikitext-2-raw-v1')
-tokenized = dataset.map(tokenize_function, batched=True)
-```
+**Key Functions:**
 
-**3. train_epoch_ddp()**: Data Parallel training loop
-- Model wrapped in `DistributedDataParallel`
-- Gradients synchronized automatically after backward()
+1. **setup_distributed()**: Initialize multi-GPU communication
+2. **prepare_dataset()**: Load WikiText-2 and tokenize text
+3. **train_epoch_ddp()**: Data Parallelism training loop
+4. **train_epoch_deepspeed()**: ZeRO training loop with automatic sharding
+5. **main()**: Orchestrates entire training pipeline with detailed logging
 
-**4. train_epoch_deepspeed()**: ZeRO training loop  
-- Model wrapped by DeepSpeed engine
-- Memory sharding handled automatically
-- Use `model_engine.backward(loss)` instead of `loss.backward()`
+**Educational Features:**
+- ✅ Extensive inline comments explaining "why" not just "what"
+- ✅ Memory usage displayed after each epoch
+- ✅ Step-by-step numbered sections
+- ✅ Real-world examples and calculations
+- ✅ No command-line args - simple CONFIG dictionary
 
 ---
 
@@ -273,13 +369,21 @@ GPU 0 Memory:
 
 ---
 
-## 📚 Further Reading
+## 📚 Documentation
 
-- **REAL_MODELS_GUIDE.md**: Comprehensive guide with more GPT-2 examples and tips
-- **CLUSTER_QUICKSTART.md**: Quick setup guide for your cluster
+### Tutorial Files
+
+- **README.md** (this file): Quick start and overview
+- **TRAINING_RESULTS.md**: Complete experimental results with all 5 strategies tested
+- **REAL_MODELS_GUIDE.md**: Comprehensive GPT-2 guide with advanced tips
+- **CLUSTER_QUICKSTART.md**: Quick cluster setup instructions
+
+### External Resources
+
 - **DeepSpeed Documentation**: [deepspeed.ai](https://www.deepspeed.ai/)
 - **ZeRO Paper**: [arxiv.org/abs/1910.02054](https://arxiv.org/abs/1910.02054)
 - **HuggingFace Transformers**: [huggingface.co/docs/transformers](https://huggingface.co/docs/transformers)
+- **PyTorch DDP Tutorial**: [pytorch.org/tutorials/intermediate/ddp_tutorial.html](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html)
 
 ---
 
@@ -287,31 +391,44 @@ GPU 0 Memory:
 
 ### Issue: CUDA Out of Memory
 **Solution**: 
-- Reduce `--batch_size`
-- Switch to ZeRO-3: `--strategy zero3`
-- Use gradient accumulation steps in DeepSpeed config
+- Reduce `batch_size` in CONFIG (try 2 or 1)
+- Switch to ZeRO-3: `"strategy": "zero3"`
+- Try ZeRO-Offload: `"strategy": "offload"`
 
-### Issue: Slow Training
-**Solution**:
-- Check `overlap_comm: true` in DeepSpeed config
-- Increase `stage3_prefetch_bucket_size` 
-- Verify fast interconnect (InfiniBand/NVLink)
-
-### Issue: NCCL Timeout
+### Issue: "cannot load MPI library" when running
 **Solution**:
 ```bash
-export NCCL_TIMEOUT=3600  # Increase timeout
-export NCCL_DEBUG=INFO    # Enable debug logging
+# ❌ Don't use: python real_model_example.py (for ZeRO strategies)
+# ✅ Use: deepspeed launcher
+deepspeed --num_gpus=1 real_model_example.py
 ```
 
-### Issue: Model Download Fails
+### Issue: "invalid device ordinal" 
 **Solution**:
 ```bash
-# Pre-download models
-python -c "from transformers import GPT2LMHeadModel; GPT2LMHeadModel.from_pretrained('gpt2')"
+# Check how many GPUs you have
+nvidia-smi
 
-# Or set cache directory
-export HF_HOME=/path/to/cache
+# Use correct number (if you only have 1 GPU):
+deepspeed --num_gpus=1 real_model_example.py
+```
+
+### Issue: Batch size mismatch error
+**Solution**:
+The DeepSpeed config batch sizes are set for 1 GPU. If using multiple GPUs, update all 5 config files:
+```json
+{
+  "train_batch_size": 16,              // num_gpus × batch_size
+  "train_micro_batch_size_per_gpu": 4,
+  "gradient_accumulation_steps": 1
+}
+```
+
+### Issue: Model download is slow
+**Solution**:
+```bash
+# Pre-download once:
+python -c "from transformers import GPT2LMHeadModel, GPT2Tokenizer; GPT2LMHeadModel.from_pretrained('gpt2-medium'); GPT2Tokenizer.from_pretrained('gpt2-medium')"
 ```
 
 ---
@@ -340,20 +457,24 @@ See **REAL_MODELS_GUIDE.md** for more experiments!
 
 ---
 
-## 📖 Additional Resources
+## 📖 Files in This Tutorial
 
-- **Files in this tutorial**:
-  - `real_model_example.py` - Main training script
-  - `ds_config_stage*.json` - DeepSpeed configurations
-  - `REAL_MODELS_GUIDE.md` - Detailed GPT-2 guide
-  - `CLUSTER_QUICKSTART.md` - Quick cluster setup
-  - `compare_strategies.sh` - Automated benchmarking
+### Core Files
+- **real_model_example.py** - Main training script (850+ lines, extensively documented)
+- **requirements.txt** - Python dependencies
 
-- **External Resources**:
-  - [DeepSpeed Official Docs](https://www.deepspeed.ai/)
-  - [ZeRO Paper (arXiv)](https://arxiv.org/abs/1910.02054)
-  - [HuggingFace Transformers](https://huggingface.co/docs/transformers)
-  - [PyTorch DDP Tutorial](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html)
+### DeepSpeed Configurations (5 files)
+- **ds_config_stage1.json** - ZeRO Stage 1 (optimizer sharding)
+- **ds_config_stage2.json** - ZeRO Stage 2 (optimizer + gradient sharding) ⭐
+- **ds_config_stage3.json** - ZeRO Stage 3 (full parameter sharding)
+- **ds_config_offload.json** - ZeRO-Offload (CPU memory)
+- **ds_config_infinity.json** - ZeRO-Infinity (NVMe storage)
+
+### Documentation (4 files)
+- **README.md** - This file (quick start guide)
+- **TRAINING_RESULTS.md** - Complete test results and analysis
+- **REAL_MODELS_GUIDE.md** - Advanced GPT-2 examples
+- **CLUSTER_QUICKSTART.md** - Cluster setup instructions
 
 ---
 
