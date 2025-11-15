@@ -29,7 +29,7 @@ Each example shows:
 
 ---
 
-## � Available Models
+## 🤖 Available Models
 
 | Model | Parameters | Memory (FP16) | Best For |
 |-------|-----------|---------------|----------|

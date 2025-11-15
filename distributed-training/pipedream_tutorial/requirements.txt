@@ -1,0 +1,9 @@
+# PipeDream Tutorial Requirements
+
+# Core dependencies
+torch>=2.0.0
+matplotlib>=3.5.0
+numpy>=1.21.0
+
+# Optional (for extended examples)
+torchvision>=0.15.0
