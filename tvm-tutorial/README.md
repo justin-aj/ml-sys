@@ -138,36 +138,36 @@ sch, args = task.apply_best("tune.log")
 
 ### Beginner (1-2 hours)
 
-1. ✅ Read START_HERE.txt
-2. ✅ Run simple_intro.py
-3. ✅ Understand Tensor Expressions and Schedules
-4. ✅ Experiment with different tile sizes
+1. ✅ Read this README and LEARNING_GUIDE.md
+2. ✅ Understand Tensor Expressions and Schedules concepts
+3. ✅ Review schedule primitives table
+4. ✅ Compare TVM approach with Triton/PyTorch alternatives
 
 **Goal:** Understand separation of algorithm and optimization.
 
 ### Intermediate (2-4 hours)
 
-1. ✅ Run gpu_optimization.py
-2. ✅ Read LEARNING_GUIDE.md (GPU Optimization section)
-3. ✅ Modify GPU schedules (try different tile sizes)
-4. ✅ Compare with PyTorch performance
+1. ✅ Read LEARNING_GUIDE.md (GPU Optimization section)
+2. ✅ Study GPU schedule primitives (split, bind, cache)
+3. ✅ Explore REAL_WORLD_USES.md for production examples
+4. ✅ Compare TVM concepts with mega-kernels tutorial
 
-**Goal:** Master GPU schedule primitives (split, bind, cache).
+**Goal:** Master GPU schedule primitives conceptually.
 
 ### Advanced (4-8 hours)
 
-1. ✅ Run auto_tuning.py (full mode - 1000 trials)
-2. ✅ Read REAL_WORLD_USES.md
-3. ✅ Implement custom operator (e.g., GELU+matmul fusion)
-4. ✅ Compile a full PyTorch model to TVM
+1. ✅ Read REAL_WORLD_USES.md for production case studies
+2. ✅ Study auto-tuning concepts in LEARNING_GUIDE.md
+3. ✅ Explore TVM_ALTERNATIVES.md for practical implementations
+4. ✅ Implement similar concepts using Triton or torch.compile()
 
-**Goal:** Deploy production-ready optimized models.
+**Goal:** Understand production ML compilation strategies.
 
 ---
 
 ## 📊 Expected Performance
 
-### CPU Performance (simple_intro.py)
+### Expected CPU Performance
 
 Matrix multiplication (512x512):
 
@@ -179,7 +179,7 @@ Matrix multiplication (512x512):
 
 **Optimizations:** Tiling (32x32) + Vectorization + Parallelization
 
-### GPU Performance (gpu_optimization.py)
+### Expected GPU Performance
 
 Matrix multiplication (2048x2048) on V100:
 

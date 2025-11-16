@@ -1,7 +1,6 @@
 # PagedAttention Quick Start Guide
 
 ## Table of Contents
-- [Hands-On Benchmark](#hands-on-benchmark-run-on-v100)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
 - [Common Patterns](#common-patterns)
@@ -10,55 +9,35 @@
 
 ---
 
-## Hands-On Benchmark (Run on V100!)
+## Expected Performance
 
-**Want to see PagedAttention's memory savings in action?** Run this benchmark on your V100 GPU!
+**PagedAttention's memory savings on V100 32GB:**
 
-### Quick Start
+### Memory Efficiency
 
-```bash
-cd llm-serving/pagedattention_tutorial
+1. **Variable-length requests (100 users)**
+   - Standard approach wastes ~77% of memory via pre-allocation
+   - PagedAttention allocates exactly what's needed (~0% waste)
 
-# Install dependencies
-pip install torch matplotlib
-
-# Run the benchmark (30-60 seconds)
-python paged_attention_benchmark.py
-```
-
-### What It Measures
-
-This benchmark demonstrates **memory efficiency** (not kernel speed):
-
-1. **Benchmark 1**: Variable-length requests (100 users)
-   - Shows how pre-allocation wastes ~77% of memory
-   - PagedAttention allocates exactly what's needed
-
-2. **Benchmark 2**: Throughput scaling on V100
+2. **Throughput scaling on V100**
    - How many concurrent users can a 32GB V100 serve?
-   - Standard: ~25 users | PagedAttention: ~100 users (4x!)
+   - Standard: ~25 users | PagedAttention: ~100 users (4×!)
 
-3. **Benchmark 3**: Prefix sharing (system prompts)
+3. **Prefix sharing (system prompts)**
    - 100 users sharing a 500-token system prompt
    - PagedAttention saves ~83% memory via block sharing
 
-### Expected Results
+### Typical Results
 
 On a **V100 32GB**, you should see:
 
 | Metric | Standard | PagedAttention | Improvement |
 |--------|----------|----------------|-------------|
-| Memory waste | 77% | 0% | 77% saved |
-| Concurrent users | ~25 | ~100 | 4x more |
-| With prefix sharing | 60K tokens | 10.5K tokens | 5.7x compression |
+| Memory waste | 77% | ~0% | 77% saved |
+| Concurrent users | ~25 | ~100 | 4× more |
+| With prefix sharing | 60K tokens | 10.5K tokens | 5.7× compression |
 
-### After Running
-
-1. **Check the visualization**: `benchmark_results.png` shows memory comparisons
-2. **Record your results**: Fill in `BENCHMARK_RESULTS.md` with your V100 numbers
-3. **Compare with production vLLM**: Install vLLM and see 3-4x throughput gains
-
-**Why this matters:** These memory savings translate directly to serving 4x more users per GPU in production!
+**Why this matters:** These memory savings translate directly to serving 4× more users per GPU in production!
 
 ---
 

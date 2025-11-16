@@ -300,7 +300,7 @@ python -c "from datasets import load_dataset; load_dataset('wikitext', 'wikitext
 
 ---
 
-## 📈 What to Expect (Actual Results - Tested November 15, 2025)
+## 📈 What to Expect (Actual Results - Tested December 2024)
 
 ### Single GPU Results (gpt2-medium: 355M params):
 

@@ -11,7 +11,7 @@ Real PipeDream needs multiple GPUs, but you'll learn all the core concepts here!
 Goal: Show how microbatches keep GPUs busy and why weight versioning is needed.
 
 Author: Educational tutorial
-Date: November 15, 2025
+Date: December 2024
 """
 
 import torch

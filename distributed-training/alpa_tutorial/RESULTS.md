@@ -2,7 +2,7 @@
 
 ## Environment Setup
 
-**Date**: November 15, 2025  
+**Date**: December 2024  
 **Python Version**: 3.10  
 **Dependencies Installed**:
 - JAX: 0.6.2

@@ -6,7 +6,7 @@ This script creates a visual comparison showing:
 2. Microbatch pipeline (high GPU utilization)
 
 Author: Educational tutorial
-Date: November 15, 2025
+Date: December 2024
 """
 
 import matplotlib.pyplot as plt

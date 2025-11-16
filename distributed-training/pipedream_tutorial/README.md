@@ -4,7 +4,7 @@
 > 
 > **Status:** ✅ Educational tutorial - Works on **1 GPU** (simulates multi-GPU behavior)
 > 
-> **Updated:** November 15, 2025
+> **Updated:** December 2024
 
 ---
 
@@ -289,7 +289,7 @@ python pipedream_visual.py
 
 ## 📊 Actual Test Results
 
-**Tested:** November 15, 2025 (Single GPU - Simulation Mode)  
+**Tested:** December 2024 (Single GPU - Simulation Mode)  
 **Configuration:** 4 stages, 4 microbatches, batch size 32
 
 ### Sample Output

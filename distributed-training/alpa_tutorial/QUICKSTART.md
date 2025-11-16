@@ -181,9 +181,6 @@ def train(model, batch):
 # Simple MLP example
 python alpa_simple.py
 
-# Transformer example
-python alpa_transformer.py
-
 # See parallelization plan
 python alpa_visualize.py
 ```

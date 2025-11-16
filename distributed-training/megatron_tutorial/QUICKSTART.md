@@ -15,20 +15,17 @@ Welcome to the Megatron-LM conceptual tutorial! This guide will help you underst
 
 ## 🚀 Getting Started (5 Minutes)
 
-### Step 1: View Visualizations
+### Step 1: Understand Key Visualizations
 
-Run the visualization generator:
-```bash
-python megatron_visualize.py
-```
+The tutorial includes conceptual diagrams for:
+- **Tensor Parallelism** - Column/row parallel explained
+- **3D Parallelism Cube** - D×P×T cube visualization
+- **Communication Patterns** - Three communication groups
+- **Memory Distribution** - Memory breakdown
+- **Performance Comparison** - Framework comparison
+- **Scaling Efficiency** - Scaling to thousands of GPUs
 
-This creates 6 PNG diagrams:
-- `tensor_parallelism.png` - Column/row parallel explained
-- `3d_parallelism_cube.png` - D×P×T cube visualization
-- `communication_patterns.png` - Three communication groups
-- `memory_distribution.png` - Memory breakdown
-- `performance_comparison.png` - Framework comparison
-- `scaling_efficiency.png` - Scaling to thousands of GPUs
+These concepts are explained in detail throughout the documentation.
 
 ### Step 2: Read Core Concepts
 
@@ -215,11 +212,10 @@ Near-linear scaling from 64 to 2048 GPUs (92% at 1024 GPUs!).
 
 ## 🌟 Next Steps
 
-1. **Generate visualizations**: Run `python megatron_visualize.py`
-2. **Read main guide**: Open `README.md`
-3. **Explore concepts**: Dive into `CONCEPTS.md`
-4. **Understand 3D**: Study `3D_PARALLELISM.md`
-5. **Compare frameworks**: Read `COMPARISON.md`
+1. **Read main guide**: Open `README.md`
+2. **Explore concepts**: Dive into `CONCEPTS.md`
+3. **Understand 3D**: Study `3D_PARALLELISM.md`
+4. **Compare frameworks**: Read `COMPARISON.md`
 
 ---
 
@@ -258,11 +254,6 @@ After completing this tutorial, you will:
 
 ## 🚀 Ready to Learn?
 
-Start with:
-```bash
-python megatron_visualize.py
-```
-
-Then open `README.md` and begin your journey into large-scale deep learning!
+Start by opening `README.md` to begin your journey into large-scale deep learning!
 
 Happy learning! 🎉

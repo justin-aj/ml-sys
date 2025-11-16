@@ -1,6 +1,6 @@
 # LLM Serving - Current Status
 
-**Last Updated**: November 15, 2025
+**Last Updated**: December 2024
 
 ## Overview
 
@@ -241,7 +241,7 @@ PagedAttention works great with:
 
 ---
 
-## 📚 Recent Updates (Nov 15, 2025)
+## 📚 Recent Updates (Dec 2024)
 
 ### ✅ Completed
 

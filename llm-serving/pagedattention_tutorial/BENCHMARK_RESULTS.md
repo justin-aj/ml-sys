@@ -198,30 +198,13 @@ PagedAttention:
 
 ## Running the Benchmark Yourself
 
-```bash
-cd llm-serving/pagedattention_tutorial
-
-# Install dependencies
-pip install torch matplotlib
-
-# Run benchmark (requires CUDA GPU)
-python paged_attention_benchmark.py
-```
-
-**Expected runtime:** 30-60 seconds
-
-The script will:
-1. Run 3 memory efficiency benchmarks
-2. Generate `benchmark_results.png` with visualizations
-3. Print memory savings and throughput improvements
-
 ---
 
-## Next Steps
+## Using vLLM
 
 Want to see PagedAttention in production?
 
-### 1. Try vLLM (Production Implementation)
+### Install and Run vLLM
 
 ```bash
 pip install vllm
@@ -233,11 +216,11 @@ python -m vllm.entrypoints.openai.api_server \
 ```
 
 **You'll see:**
-- 3-4x higher throughput than HuggingFace Transformers
+- 2-24× higher throughput than HuggingFace Transformers
 - Automatic prefix sharing
 - GPU memory fully utilized
 
-### 2. Compare with Standard Serving
+### Compare with Standard Serving
 
 ```bash
 # HuggingFace Transformers (standard approach)
@@ -246,7 +229,7 @@ pip install transformers accelerate
 # Compare throughput and memory usage
 ```
 
-### 3. Production Resources
+### Production Resources
 
 - **vLLM Paper:** https://arxiv.org/abs/2309.06180
 - **vLLM GitHub:** https://github.com/vllm-project/vllm
@@ -258,7 +241,7 @@ pip install transformers accelerate
 
 PagedAttention demonstrates that **memory management matters** for LLM serving:
 
-- **77% memory waste** eliminated → **4x more users** per GPU
+- **77% memory waste** eliminated → **4× more users** per GPU
 - **Prefix sharing** → **83% savings** on shared prompts
 - **Production proven** → Powers ChatGPT-scale systems
 
@@ -266,4 +249,4 @@ Unlike kernel optimizations (FlashAttention, Triton), PagedAttention optimizes *
 
 ---
 
-*Fill in your V100 results by running `paged_attention_benchmark.py`!*
+*See QUICKSTART.md to install and use vLLM with PagedAttention!*

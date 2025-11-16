@@ -1,61 +1,15 @@
 # PagedAttention Tutorial
 
-## 🎯 Quick Start: Run on V100 GPU!
+## 🎯 Overview
 
-**Two ways to see PagedAttention in action:**
+This tutorial explains **PagedAttention** - the memory management innovation behind vLLM that achieves 2-24× higher throughput for LLM inference.
 
-### Option 1: Memory Calculator (Recommended Start)
+**What you'll learn:**
+- How KV cache becomes the memory bottleneck in LLM serving
+- PagedAttention's solution using virtual memory paging concepts
+- Implementation details and production deployment strategies
 
-```bash
-cd llm-serving/pagedattention_tutorial
-pip install torch matplotlib
-python paged_attention_benchmark.py  # 30 seconds
-```
-
-**What it does:** Calculates memory requirements mathematically
-- ✅ Fast (30 seconds)
-- ✅ No vLLM needed
-- ✅ Educational (shows the math)
-- ✅ Works on CPU or GPU
-
-**You'll see:**
-- 77% memory waste eliminated with variable-length requests
-- 4x more concurrent users on V100 (32GB)
-- 83% memory saved with prefix sharing
-
-### Option 2: Real vLLM Benchmark (Validation)
-
-```bash
-pip install vllm  # Requires CUDA 11.8+, Linux/WSL
-python vllm_real_benchmark.py --test all  # 2-5 minutes
-```
-
-**What it does:** Actually runs vLLM inference
-- ✅ Real throughput measurements
-- ✅ Actual GPU memory usage
-- ✅ Proves PagedAttention works
-- ⚠️ Requires vLLM installed
-
-**You'll see:**
-- Actual requests/second and latency
-- Real GPU memory utilization
-- Batch scaling efficiency
-
-### Comparison
-
-| Feature | Memory Calculator | Real vLLM Benchmark |
-|---------|-------------------|---------------------|
-| **Runtime** | 30 seconds | 2-5 minutes |
-| **Requirements** | torch, matplotlib | vllm (CUDA, Linux) |
-| **What it measures** | Memory calculations | Actual performance |
-| **Best for** | Learning concept | Validation |
-| **Works on CPU?** | Yes (reduced scale) | No (GPU only) |
-
-**Start with Option 1** to understand the concept, then use **Option 2** if you want real numbers!
-
----
-
-See [QUICKSTART.md](QUICKSTART.md) for details and [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) to record your V100 results!
+See [QUICKSTART.md](QUICKSTART.md) for vLLM installation and usage, and [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) for expected performance metrics
 
 ---
 

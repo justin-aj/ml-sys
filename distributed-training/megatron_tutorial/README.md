@@ -799,7 +799,7 @@ Companies Using Megatron-LM:
 2. **Study tensor parallelism** - See CONCEPTS.md for deep dive
 3. **Learn 3D parallelism** - See 3D_PARALLELISM.md
 4. **Compare approaches** - See COMPARISON.md
-5. **Explore visualizations** - Run megatron_visualize.py
+5. **Review visualizations** - See descriptions and conceptual diagrams in documentation
 
 ---
 

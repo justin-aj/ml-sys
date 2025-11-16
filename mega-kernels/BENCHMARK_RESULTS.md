@@ -185,7 +185,7 @@ The **50% memory bandwidth savings** translates directly into performance gains,
 
 ---
 
-*Benchmarked on: November 7, 2025*  
+*Benchmarked on: December 2024*  
 *GPU: NVIDIA Tesla V100-SXM2-32GB*  
 *CUDA Version: 12.8.0*  
 *PyTorch Version: 2.0.0+*

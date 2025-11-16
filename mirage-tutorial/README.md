@@ -354,7 +354,7 @@ optimal = mirage.extract(egraph, cost_model="v100")
 
 ### Research Deployments
 
-**Current Status (2023-2025):**
+**Current Status (2024):**
 - Research prototype evolving into production tools
 - Techniques adopted by major ML compilers
 - Active development for LLM inference optimization

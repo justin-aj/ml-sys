@@ -511,4 +511,4 @@ target = tvm.target.Target("llvm -mtriple=wasm32-unknown-unknown")
 - Performance-critical inference
 - Research on ML compilers
 
-Start with `simple_intro.py`, then `gpu_optimization.py`, then `auto_tuning.py`!
+**Learning Path:** Start with this guide, then REAL_WORLD_USES.md, then explore alternatives in TVM_ALTERNATIVES.md!

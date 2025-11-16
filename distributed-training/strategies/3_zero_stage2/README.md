@@ -81,7 +81,7 @@ bash run.sh
 
 ## 📊 Performance Results
 
-**Tested:** November 15, 2025 (Single GPU)  
+**Tested:** December 2024 (Single GPU)  
 **Model:** GPT-2 Medium (355M parameters)  
 **Dataset:** WikiText-2 (1000 samples)
 

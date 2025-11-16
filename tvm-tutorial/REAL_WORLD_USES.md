@@ -655,10 +655,10 @@ output = module.get_output(0).numpy()
 - Cost optimization (cheaper hardware)
 - Maximum performance on non-NVIDIA GPUs
 
-**Start simple:**
-1. Run `simple_intro.py` to understand basics
-2. Try `gpu_optimization.py` on your V100
-3. Experiment with `auto_tuning.py`
-4. Integrate into your ML pipeline
+**Start learning:**
+1. Read LEARNING_GUIDE.md to understand compilation concepts
+2. Study schedule primitives and auto-tuning approaches
+3. Explore production examples in this document
+4. Try practical alternatives (Triton, torch.compile) in TVM_ALTERNATIVES.md
 
-TVM is the future of ML deployment! 🚀
+TVM concepts power modern ML deployment! 🚀
