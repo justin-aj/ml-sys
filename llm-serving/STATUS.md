@@ -46,15 +46,87 @@ This directory focuses on **LLM inference and serving optimization**, separate f
 5. `performance_comparison.png` - System benchmarks
 6. `attention_flow.png` - Computation flow
 
+### 2. SGLang Tutorial
+
+**Path**: `sglang_tutorial/`
+
+**Status**: ✅ Complete
+
+**Strategy**: RadixAttention + Structured Generation
+
+**Framework**: SGLang (UC Berkeley)
+
+**Key Features**:
+- Automatic prefix sharing via Radix Tree
+- Token-by-token structured generation (JSON, regex, grammar)
+- 3× faster than vLLM for structured tasks
+- 100% valid output guarantee
+- Production-ready at ByteDance, Meta
+
+**Documentation**:
+- `README.md` (19KB) - Complete tutorial with examples
+
+**Visualizations** (3 images):
+1. `radix_tree_structure.png` - Radix Tree for automatic prefix sharing
+2. `sglang_performance_comparison.png` - Throughput vs vLLM
+3. `structured_generation_flow.png` - JSON validation pipeline
+
+### 3. Speculative Decoding Tutorial
+
+**Path**: `speculative_decoding_tutorial/`
+
+**Status**: ✅ Complete
+
+**Strategy**: Draft-then-verify parallel generation
+
+**Key Features**:
+- 2-3× speedup without quality loss
+- Small draft model + large target model
+- Mathematical guarantees
+- Acceptance rate optimization
+- Production deployment strategies
+
+**Documentation**:
+- `README.md` (21KB) - Complete algorithm walkthrough
+
+**Visualizations** (3 images):
+1. `standard_vs_speculative.png` - Sequential vs parallel comparison
+2. `speculative_algorithm_flow.png` - Complete 3-phase algorithm
+3. `acceptance_rate_analysis.png` - Mathematical speedup analysis
+
+### 4. Tree-based Speculative Inference Tutorial
+
+**Path**: `tree_speculative_tutorial/`
+
+**Status**: ✅ Complete
+
+**Strategy**: Multi-path exploration with tree attention
+
+**Key Features**:
+- 3-4× speedup via tree speculation
+- SpecInfer (draft model) vs Medusa (multi-head) approaches
+- Tree attention for parallel verification
+- Higher acceptance rates than linear speculation
+- Advanced production techniques
+
+**Documentation**:
+- `README.md` (25KB) - Complete tree-based algorithms
+
+**Visualizations** (4 images):
+1. `tree_structure_visualization.png` - Tree vs linear speculation
+2. `tree_attention_mask.png` - Attention mask matrix
+3. `specinfer_vs_medusa.png` - Two main approaches compared
+4. `speedup_comparison.png` - All methods benchmarked
+
 ---
 
 ## 📊 Statistics
 
-**Total Tutorials**: 1  
-**Total Documentation Files**: 5  
-**Total Visualizations**: 6 PNG images  
-**Lines of Documentation**: ~1,200 lines  
-**Total Size**: ~88KB documentation + ~720KB visualizations
+**Total Tutorials**: 4  
+**Total Documentation Files**: 9  
+**Total Visualizations**: 16 PNG images  
+**Lines of Documentation**: ~4,200 lines  
+**Total Size**: ~320KB documentation + ~2.8MB visualizations
 
 ---
 
