@@ -18,7 +18,7 @@ This repository contains **7 complete tutorials** teaching modern GPU optimizati
 | **[Triton](./triton-tutorial/)** | Kernel | 2-3 hours | 1.3-1.5x | Production GPU programming in Python | ✅ Hands-On |
 | **[Ansor](./ansor-tutorial/)** | Schedule | 30 min | 1.2-1.5x | ML-guided auto-tuning | 📖 Concept Only |
 | **[Distributed Training](./distributed-training/)** | System | 2 hours | 64x memory | ZeRO, Data Parallel, Multi-GPU training | ✅ Hands-On |
-| **[LLM Serving](./llm-serving/)** | Inference | 3 hours | 2-24x throughput | PagedAttention, SGLang, Speculative Decoding | ✅ Hands-On |
+| **[LLM Serving](./llm-serving/)** | Inference | 3 hours | 2-24x throughput | PagedAttention, SGLang, Speculative Decoding | 📖 Concept Only |
 
 **Combined Impact:** Stack these techniques for **2-5x end-to-end speedup** on real models!
 
