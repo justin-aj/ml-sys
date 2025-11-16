@@ -36,7 +36,7 @@
   - Working example with Python 3.10
   - Comprehensive documentation
 
-#### 4. Megatron-LM Tutorial (`megatron_tutorial/`) ⭐ NEW
+#### 4. Megatron-LM Tutorial (`megatron_tutorial/`)
 - **Strategy**: Tensor + Pipeline + Data (3D Parallelism)
 - **Framework**: Conceptual (NVIDIA Megatron-LM)
 - **Status**: Complete ✅
@@ -82,14 +82,12 @@ distributed-training/
 │   ├── requirements.txt         # Dependencies
 │   └── *.png                    # 6 visualizations ✅
 │
-└── megatron_tutorial/          # ⭐ NEW
+└── megatron_tutorial/
     ├── README.md                # 33KB comprehensive guide
     ├── QUICKSTART.md            # Quick start guide
     ├── CONCEPTS.md              # Tensor parallelism deep dive
     ├── 3D_PARALLELISM.md        # D×P×T explained
     ├── COMPARISON.md            # vs ZeRO/Alpa/PipeDream
-    ├── TUTORIAL_COMPLETE.md     # Summary
-    ├── megatron_visualize.py    # Generates visualizations
     └── *.png                    # 6 visualizations ✅
 ```
 
@@ -108,7 +106,7 @@ distributed-training/
    - Optax: 0.1.3 → 0.2.6
    - All packages compatible and working
 
-3. **Megatron-LM Tutorial Created** ⭐ NEW
+3. **Megatron-LM Tutorial Created**
    - Complete conceptual tutorial (no code execution needed)
    - 5 comprehensive documentation files (~85KB total)
    - 6 visualization diagrams generated (~580KB)
@@ -117,7 +115,7 @@ distributed-training/
 
 4. **File Cleanup**
    - Removed temporary tracking files
-   - Removed CLEANUP_SUMMARY.md (replaced by RESULTS.md)
+   - Removed visualization scripts after image generation
    - Organized all documentation properly
    - Generated all missing visualizations
 
@@ -172,6 +170,13 @@ distributed-training/
 - ✅ Want optimal performance automatically
 - Best for: Research, complex models, JAX users
 
+**Megatron-LM (3D Parallelism)**:
+- ✅ Extremely large models (100B+)
+- ✅ Production deployments (GPT-3 scale)
+- ✅ Need all three parallelism dimensions
+- ✅ Maximum scaling to thousands of GPUs
+- Best for: 100B+ parameters, production at scale
+
 ## Testing Status
 
 ### ✅ Verified Working
@@ -211,10 +216,15 @@ distributed-training/
 
 ## Summary
 
-🎉 **All three major distributed training strategies are documented, tested, and ready to use!**
+🎉 **All four major distributed training strategies are documented, tested, and ready to use!**
 
 - **ZeRO**: Production-ready PyTorch data parallelism
 - **PipeDream**: Pipeline parallelism with excellent visualizations
 - **Alpa**: Cutting-edge automatic parallelism with JAX
+- **Megatron-LM**: 3D parallelism for extreme scale (100B+ parameters)
 
 Each tutorial includes theory, code examples, visualizations, and comparisons. The repository provides a complete learning resource for distributed deep learning.
+
+---
+
+**Note**: For LLM inference/serving optimization (PagedAttention, vLLM), see the separate `llm-serving/` directory.

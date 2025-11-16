@@ -1,0 +1,26 @@
+# PagedAttention Tutorial Requirements
+
+# ============================================================================
+# Option 1: Memory Calculator (paged_attention_benchmark.py)
+# ============================================================================
+torch>=2.0.0
+matplotlib>=3.5.0
+numpy>=1.21.0
+
+# ============================================================================
+# Option 2: Real vLLM Benchmark (vllm_real_benchmark.py)
+# ============================================================================
+# Uncomment to install vLLM (requires CUDA 11.8+, Linux/WSL):
+# vllm>=0.2.0
+
+# Note: vLLM requirements:
+# - Python 3.8-3.11 (not 3.12+)
+# - CUDA 11.8 or 12.1
+# - Linux or WSL2 (not native Windows)
+# - GPU with compute capability 7.0+ (V100, A100, RTX 20xx+)
+
+# ============================================================================
+# Optional: For vLLM usage examples
+# ============================================================================
+# transformers>=4.30.0
+# huggingface-hub>=0.16.0
